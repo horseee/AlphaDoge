@@ -1,6 +1,6 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QWidget ,QGridLayout, QVBoxLayout, QLabel
-from game import GoEnv, colormap, DigitClock
+from game import GoGame, colormap, DigitClock
 import math
 
 boardFrac = 0.85
@@ -19,7 +19,7 @@ class App(QWidget):
 		assert(boardFrac>=0.5)
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.left, self.top,self.width, self.height)
-		self.env = GoEnv(size=9, width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95)
+		self.env = GoGame(size=9, width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95)
 		self.layout = QGridLayout()
 		self.layout.setColumnStretch(0, math.ceil(boardFrac/(1-boardFrac)))
 		self.layout.addWidget(self.env,0,0)
