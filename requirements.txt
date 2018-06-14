@@ -1,0 +1,4 @@
+pachi_py
+numpy
+PyQt5
+gym<0.9.5
