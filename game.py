@@ -1,20 +1,20 @@
-import sys
 from PyQt5.QtWidgets import QApplication, QWidget, QLCDNumber,QGridLayout
 from PyQt5.QtGui import QColor, QPainter, QBrush,QMouseEvent,QCursor,QFont, QPixmap
 from PyQt5.QtCore import QTimer, QTime, Qt, QObject, QRectF
-import numpy as np 
 
+import numpy as np 
+import sys
 import gym
-from utils import *
 import pachi_py
+
 from myGoEnv import myGoEnv
+from utils import *
 
 colormap = {
 	'black': pachi_py.BLACK,
     'white': pachi_py.WHITE,
 	'empty':  pachi_py.EMPTY
 }
-
 class GoGame(QWidget):
 	# init class
 	def __init__(self, size=9, width=800, height=800):
