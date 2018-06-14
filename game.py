@@ -37,7 +37,6 @@ class GoGame(QWidget):
 		observation, reward, done, info = self.env.step(toGo(r,c))
 		print(info)
 		return True
-		#return False
 
 	# reset board
 	def reset(self):
@@ -49,8 +48,12 @@ class GoGame(QWidget):
 		if QMouseEvent.button() == Qt.LeftButton:
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
-			if self.act(row,col):
-				self.update()		
+			if self.is_empty(row, col):
+				self.act(row,col)
+				self.update()	
+
+	def is_empty(self,r,c):
+		return self.env.state.board[r,c]==colormap['empty']
 
 	########   GUI   #######
 	def paintEvent(self,event):
