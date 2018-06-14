@@ -11,7 +11,7 @@ class AlphaDoge(object):
         else: self.color=2
     
     def make_policy(self):
-        return 0,1
+        return 0, 1
     
     def find_legal_pos():
         pass
