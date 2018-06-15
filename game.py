@@ -49,6 +49,7 @@ class GoGame(QWidget):
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
 			if self.is_empty(row, col):
+				print('ACTION: (%d, %d)'%(row, col)) 
 				self.act(row,col)
 				self.update()	
 
@@ -103,10 +104,11 @@ class GoGame(QWidget):
 
 # give a handler. It will be called when the time is over
 class DigitClock(QLCDNumber):
-	def __init__(self,size, digits=8,parent=None,handler=None):
+	def __init__(self,size, digits=8,parent=None,handler=None,timeLimit=300):
 		super(DigitClock, self).__init__(digits,parent)
 		self.handler = handler
-		self.timeLeft = 60
+		self.timeLimit = timeLimit
+		self.timeLeft = timeLimit
 		self.display(self.timeLeft)
 		self.setDigitCount(digits)
 		self.setStyle
@@ -115,7 +117,7 @@ class DigitClock(QLCDNumber):
 		self.timer = QTimer()
 		self.timer.timeout.connect(self._update)
 		self.timer.start(1000)
-		self.timer.start(1000)
+		#self.timer.start(1000)
 		self.setSegmentStyle(QLCDNumber.Flat)
 
 	def _update(self):
@@ -126,6 +128,6 @@ class DigitClock(QLCDNumber):
 		self.display(self.timeLeft)
 
 
-	def resetTime(self,t=60):
-		self.timeLeft = t 
+	def resetTime(self):
+		self.timeLeft = self.timeLimit
 		self.timer.start(1000)

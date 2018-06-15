@@ -21,10 +21,6 @@ register(
     # This is probably due to a computation time limit.
     nondeterministic=True,
 )
-colormap = {
-        'black': pachi_py.BLACK,
-        'white': pachi_py.WHITE,
-}
 
 class myGoEnv(GoEnv):
     def __init__(self,player_color, opponent, observation_type, illegal_move_mode, board_size):
@@ -51,8 +47,6 @@ def make_random_policy(np_random):
 
 def make_doge_policy():
     return make_random_policy(np.random)
-
-
 
 def _coord_to_action(board, c):
     '''Converts Pachi coordinates to actions'''
