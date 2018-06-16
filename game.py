@@ -11,7 +11,7 @@ from go import *
 
 class GoGame(QWidget):
 	# init class
-	def __init__(self, size=9, width=800, height=800):
+	def __init__(self, size=9, opponent=None ,width=800, height=800):
 		super(GoGame, self).__init__()
 		# GUI
 		self._width = width
@@ -21,6 +21,7 @@ class GoGame(QWidget):
 		self.gridSize =  min(self._width,self._height)/(self._size+1)
 		# status
 		self.status = GoStatus()
+		self.opponent = opponent
 		self.reset()
 
 	def __getitem__(self,key):
@@ -30,7 +31,8 @@ class GoGame(QWidget):
 		""" take action at (r,c) """
 		#observation, reward, done, info = self.env.step(coord_doge2gym(r,c))
 		self.status.play_move((r,c))
-		#print(info)
+		if self.opponent!=None:
+			self.status.play_move(self.opponent.make_policy(self.status))
 		return True
 
 	# reset board

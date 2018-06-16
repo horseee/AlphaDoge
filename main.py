@@ -4,7 +4,7 @@ from game import GoGame, colormap, DigitClock
 import math
 
 boardFrac = 0.85
-
+from Opponents import RandomOppo
 class App(QWidget):
 	def __init__(self):
 		super().__init__()
@@ -19,7 +19,7 @@ class App(QWidget):
 		assert(boardFrac>=0.5)
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.left, self.top,self.width, self.height)
-		self.env = GoGame(size=9, width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95)
+		self.env = GoGame(size=9, opponent=RandomOppo(),width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95)
 		self.layout = QGridLayout()
 		self.layout.setColumnStretch(0, math.ceil(boardFrac/(1-boardFrac)))
 		self.layout.addWidget(self.env,0,0)

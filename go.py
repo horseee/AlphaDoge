@@ -38,7 +38,10 @@ class GoStatus(object):
 
     def __getitem__(self,key):
         return self.board[key]
-    
+        
+    def get_status(self):
+        return self.board
+
     def play_move(self, coord, color=None):
         b = self.board
         if color==None: color=self.to_play
@@ -48,7 +51,6 @@ class GoStatus(object):
             return True
         if not self.is_move_legal(coord):
             return False
-        
         poential_ko = is_ko(self.board, coord)
         b[coord]=color
 
@@ -56,9 +58,9 @@ class GoStatus(object):
         if len(capture_list)==1 and poential_ko==opposite:
             new_ko = capture_list[0]
         else: new_ko = None
-
         self.ko = new_ko
         self.change_player()
+
         return True
 
     def reset(self):
