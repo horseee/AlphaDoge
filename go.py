@@ -35,6 +35,8 @@ class GoStatus(object):
         self.board = np.zeros(shape=(9,9))
         self.to_play = colormap['black']
         self.ko=None
+        self.recent = []
+
     def __repr__(self):
         return '%s'%self.board
 
@@ -47,11 +49,17 @@ class GoStatus(object):
     def copy(self):
         return deepcopy(self)
 
+    def is_game_over(self):
+        return (len(self.recent) >= 2
+                and self.recent[-1].move is None
+                and self.recent[-2].move is None)
+
     def play_move(self, coord, color=None):
         b = self.board
         if color==None: color=self.to_play
         opposite = get_opposite(color)
-        if coord[0]==None:
+        if coord==None:
+            self.recent.append(coord)
             self.change_player()
             return True
         if not self.is_move_legal(coord):
@@ -65,13 +73,15 @@ class GoStatus(object):
         else: new_ko = None
         self.ko = new_ko
         self.change_player()
-
+        self.recent.append(coord)
+    
         return True
 
     def reset(self):
         self.to_play = colormap['black']
         self.board = np.zeros(shape=(9,9))
         self.ko=None
+        self.recent = []
 
     def is_move_suicidal(self, coord):
         b = self.board
@@ -85,7 +95,7 @@ class GoStatus(object):
 
     def is_move_legal(self, coord):
         b = self.board
-        if coord[0]==None:
+        if coord==None:
             return True
         r, c = coord
         if b[r,c]!=colormap['empty']: 

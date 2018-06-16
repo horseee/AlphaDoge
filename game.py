@@ -45,7 +45,7 @@ class GoGame(QWidget):
 		if QMouseEvent.button() == Qt.LeftButton:
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
-			if self.is_empty(row, col) and self.is_inboard(row,col):
+			if self.is_inboard(row,col) and self.is_empty(row, col):
 				print('ACTION: (%d, %d)'%(row, col)) 
 				self.act(row,col)
 				self.update()	

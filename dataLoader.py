@@ -26,8 +26,8 @@ class SGFLoader(object):
 
     def action_n(self, n):
         assert n>0
-        if n>self.total: return None, None
-        return coord_sgf2doge(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
+        if n>self.total: return None
+        return coord_sgf2tuple(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
 
     def reset(self):
         self.step = 0
@@ -69,7 +69,7 @@ class SGFLoader(object):
         self.cur = self.cur.next
         self.step+=1
         player = colormap['black'] if self.step%2==1 else colormap['white']
-        r, c = coord_sgf2doge( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
+        r, c = coord_sgf2tuple( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
         if r!=None:
             #self.board[r,c] = player
             self.status.play_move((r,c))
