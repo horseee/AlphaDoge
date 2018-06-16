@@ -57,6 +57,7 @@ class GoGame(QWidget):
 			return True
 		else:
 			return False
+		
 
 	########   GUI   #######
 	def paintEvent(self,event):
@@ -65,11 +66,12 @@ class GoGame(QWidget):
 		self._paintBoardAndPieces()
 		self._qp.end()
 
+
 	def _paintBoardAndPieces(self):
 		cBlack = QColor(50,50,50)
 		cWhite = QColor(255,255,255)
 		bgColor = QColor(199,163,104) #self._qp.setPen()
-
+		#
 		self._qp.setBrush(bgColor)
 		b = QBrush()
 		b.setTexture(QPixmap('images.jpg'))
