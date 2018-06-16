@@ -5,16 +5,10 @@ from PyQt5.QtCore import QTimer, QTime, Qt, QObject, QRectF
 import numpy as np 
 import sys
 import gym
-import pachi_py
 
-from myGoEnv import myGoEnv
 from utils import *
+from go import *
 
-colormap = {
-	'black': pachi_py.BLACK,
-    'white': pachi_py.WHITE,
-	'empty':  pachi_py.EMPTY
-}
 class GoGame(QWidget):
 	# init class
 	def __init__(self, size=9, width=800, height=800):
@@ -26,21 +20,22 @@ class GoGame(QWidget):
 		self._qp = QPainter()
 		self.gridSize =  min(self._width,self._height)/(self._size+1)
 		# status
-		self.env = gym.make('MyGoEnv-v0')
+		self.status = GoStatus()
 		self.reset()
 
 	def __getitem__(self,key):
-		return self.env.state.board[key]
+		return self.status.board[key]
 	
 	def act(self, r, c):
 		""" take action at (r,c) """
-		observation, reward, done, info = self.env.step(toGo(r,c))
-		print(info)
+		#observation, reward, done, info = self.env.step(coord_doge2gym(r,c))
+		self.status.play_move((r,c))
+		#print(info)
 		return True
 
 	# reset board
 	def reset(self):
-		self.env.reset()
+		self.status.reset()
 		self.update()
 
 	########## Interaction #############
@@ -54,11 +49,11 @@ class GoGame(QWidget):
 				self.update()	
 
 	def is_empty(self,r,c):
-		return self.env.state.board[r,c]==colormap['empty']
+		return self.status.board[r,c]==colormap['empty']
 
 	########   GUI   #######
 	def paintEvent(self,event):
-		print('[!] Repaint Board...')
+		#print('[!] Repaint Board...')
 		self._qp.begin(self)
 		self._paintBoardAndPieces()
 		self._qp.end()

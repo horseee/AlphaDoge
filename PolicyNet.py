@@ -11,6 +11,9 @@ class PolicyNet(object):
         self.sess = tf.Session(graph=tf.Graph(), config=config)
         self.initialize_graph()
 
+    def run(self, inputs):
+        return self.sess.run([self.output], {self.input: inputs})
+    
     def initialize_graph(self):
         with self.sess.graph.as_default():
             self.input = get_reference_input() # placeholder
@@ -22,9 +25,6 @@ class PolicyNet(object):
     def initialize_weights(self, ckpt):
         tf.train.Saver().restore(self.sess, ckpt)
         
-    def run(self, inputs):
-        return self.sess.run([self.output], {self.input: inputs})
-
     def make_policy(self,curr_state, prev_state, prev_action):
         return 0, 1
 
@@ -39,5 +39,5 @@ def model_fn(x):
 
 if __name__=='__main__':
     pn = PolicyNet()
-    out = pn.run(np.zeros(shape=(1,9,9,1)))
+    out = pn.run(np.ones(shape=(1,9,9,1)))
     print(out)

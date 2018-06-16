@@ -1,10 +1,12 @@
 import os, sys 
 import sgf
 import numpy as np
-from utils import colormap
+from utils import *
+
 
 class SGFLoader(object):
-    "Loader for single sgf files"
+    """ Loader for single sgf files
+    """
     def __init__(self, filepath):
         self.open(filepath)
 
@@ -23,7 +25,7 @@ class SGFLoader(object):
     def action_n(self, n):
         assert n>0
         if n>self.total: return None, None
-        return coord_str2int(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
+        return coord_sgf2doge(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
 
     def reset(self):
         self.step = 0
@@ -64,7 +66,7 @@ class SGFLoader(object):
         self.cur = self.cur.next
         self.step+=1
         player = colormap['black'] if self.step%2==1 else colormap['white']
-        r, c = coord_str2int( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
+        r, c = coord_sgf2doge( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
         if r!=None:
             self.board[r,c] = player
             self.check_capture(r,c)
@@ -144,12 +146,7 @@ class SGFLoader(object):
         #print("chain: ",stone_chain,isdead)        
         return isdead, stone_chain
             
-def coord_str2int(coord):
-    if coord=='': return None, None
-    #print(coord)
-    r = ord(coord[1])-ord('a')
-    c = ord(coord[0])-ord('a')
-    return r, c
+
 
 # 2 white, 1 black, 0 empty
 if __name__=='__main__':
