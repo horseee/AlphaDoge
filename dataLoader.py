@@ -3,6 +3,7 @@ import sgf
 import numpy as np
 from utils import *
 from go import *
+from copy import copy
 
 class SGFLoader(object):
     """ Loader for single sgf files

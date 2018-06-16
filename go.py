@@ -1,5 +1,6 @@
 from utils import *
 import numpy as np
+from copy import deepcopy
 
 def get_neighbor(b, coord):
     r, c = coord
@@ -29,7 +30,6 @@ def is_inboard(r, c):
     else:
         return False
 
-
 class GoStatus(object):
     def __init__(self):
         self.board = np.zeros(shape=(9,9))
@@ -43,6 +43,9 @@ class GoStatus(object):
 
     def get_status(self):
         return self.board
+
+    def copy(self):
+        return deepcopy(self)
 
     def play_move(self, coord, color=None):
         b = self.board
