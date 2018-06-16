@@ -13,7 +13,10 @@ class RandomOppo(object):
             if r==9:
                 r=0
                 c+=1
+                if c==9:
+                    c=0
             if r==oldr and c==oldc:
+                print('pass')
                 return None
-            
+        print(r,c)
         return (r,c)

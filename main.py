@@ -1,5 +1,6 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QWidget ,QGridLayout, QVBoxLayout, QLabel
+from PyQt5.QtWidgets import QApplication, QWidget ,QGridLayout, QVBoxLayout, QLabel, QPushButton
+from PyQt5.QtCore import QSize
 from game import GoGame, colormap, DigitClock
 import math
 
@@ -27,7 +28,14 @@ class App(QWidget):
 		sublayout = QVBoxLayout()
 		sublayout.addWidget(DigitClock(  size=(0.9*self.width*(1-boardFrac),
 															0.9*self.width*(1-boardFrac)/2), digits=8 ))
+		pass_buttom = QPushButton('PASS',self)
+		pass_buttom.isFlat=True
+		pass_buttom.clicked.connect(self.env.pass_move)
+		pass_buttom.setMinimumSize(QSize(0.9*self.width*(1-boardFrac),
+															0.9*self.width*(1-boardFrac)/2))
+		sublayout.addWidget(pass_buttom)
 		sublayout.addStretch(1)
+
 		self.layout.addLayout(sublayout,0,1)
 		self.setLayout(self.layout)
 		self.show()

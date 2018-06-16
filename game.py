@@ -19,6 +19,8 @@ class GoGame(QWidget):
 		self._size = int(size)
 		self._qp = QPainter()
 		self.gridSize =  min(self._width,self._height)/(self._size+1)
+
+
 		# status
 		self.status = GoStatus()
 		self.opponent = opponent
@@ -27,12 +29,13 @@ class GoGame(QWidget):
 	def __getitem__(self,key):
 		return self.status.board[key]
 	
-	def act(self, r, c):
+	def act(self, coord):
 		""" take action at (r,c) """
 		#observation, reward, done, info = self.env.step(coord_doge2gym(r,c))
-		self.status.play_move((r,c))
+		self.status.play_move(coord)
 		if self.opponent!=None:
 			self.status.play_move(self.opponent.make_policy(self.status))
+		self.update()
 		return True
 
 	# reset board
@@ -45,19 +48,24 @@ class GoGame(QWidget):
 		if QMouseEvent.button() == Qt.LeftButton:
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
-			if self.is_inboard(row,col) and self.is_empty(row, col):
+			if self.is_inboard((row,col)) and self.is_empty((row, col)):
 				print('ACTION: (%d, %d)'%(row, col)) 
-				self.act(row,col)
+				self.act((row,col))
 				self.update()	
-	def is_empty(self,r,c):
-		return self.status.board[r,c]==colormap['empty']
 
-	def is_inboard(self, r,c):
+	def is_empty(self,coord):
+		return self.status.board[coord]==colormap['empty']
+
+	def is_inboard(self, coord):
+		r, c = coord
 		if r>=0 and r<9 and c>=0 and c<9:
 			return True
 		else:
 			return False
-		
+
+	def pass_move(self):
+		self.act(None)
+		#print('PASS')
 
 	########   GUI   #######
 	def paintEvent(self,event):
@@ -104,7 +112,7 @@ class GoGame(QWidget):
 		for i in range(self._size):
 			self._qp.drawText(QRectF((i+1+0.4)*self.gridSize,0.5*self.gridSize,self.gridSize,self.gridSize), "%c"%(ord('A')+i))
 			self._qp.drawText(QRectF(0.5*self.gridSize,(i+1+0.3)*self.gridSize,self.gridSize,self.gridSize), "%d"%(self._size-i) )
-
+	
 
 # give a handler. It will be called when the time is over
 class DigitClock(QLCDNumber):

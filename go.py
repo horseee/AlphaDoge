@@ -24,18 +24,41 @@ def is_ko(b, coord):
     else:  
         return None
 
+def place_stones(board, color, stones):
+    for s in stones:
+        board[s] = color
+
 def is_inboard(r, c):
     if r>=0 and r<9 and c>=0 and c<9:
         return True
     else:
         return False
 
+def find_reached(board, c):
+    color = board[c]
+    chain = set([c])
+    reached = set()
+    frontier = [c]
+    while frontier:
+        current = frontier.pop()
+        chain.add(current)
+        neighbors = get_neighbor(board,current)
+        for n in neighbors:
+            if board[n] == color and not n in chain:
+                frontier.append(n)
+            elif board[n] != color:
+                reached.add(n)
+    return chain, reached
+
+
 class GoStatus(object):
-    def __init__(self):
+    def __init__(self, komi=7.0):
         self.board = np.zeros(shape=(9,9))
         self.to_play = colormap['black']
         self.ko=None
+        self.n=0
         self.recent = []
+        self.komi = komi
 
     def __repr__(self):
         return '%s'%self.board
@@ -51,14 +74,20 @@ class GoStatus(object):
 
     def is_game_over(self):
         return (len(self.recent) >= 2
-                and self.recent[-1].move is None
-                and self.recent[-2].move is None)
+                and self.recent[-1] is None
+                and self.recent[-2] is None)
 
     def play_move(self, coord, color=None):
+        if self.is_game_over(): 
+            print('Game Over!')
+            print(self.get_score())
+            return False
+
         b = self.board
         if color==None: color=self.to_play
         opposite = get_opposite(color)
         if coord==None:
+            self.n+=1
             self.recent.append(coord)
             self.change_player()
             return True
@@ -74,7 +103,8 @@ class GoStatus(object):
         self.ko = new_ko
         self.change_player()
         self.recent.append(coord)
-    
+        self.n+=1
+
         return True
 
     def reset(self):
@@ -82,6 +112,26 @@ class GoStatus(object):
         self.board = np.zeros(shape=(9,9))
         self.ko=None
         self.recent = []
+        self.n=0
+
+    def get_score(self):
+        UNKNOWN=5
+        working_board = np.copy(self.board)
+        while colormap['empty'] in working_board:
+            unassigned_spaces = np.where(working_board == colormap['empty'])
+            c = unassigned_spaces[0][0], unassigned_spaces[1][0]
+            territory, borders = find_reached(working_board, c)
+            border_colors = set(working_board[b] for b in borders)
+            X_border = colormap['black'] in border_colors
+            O_border = colormap['white'] in border_colors
+            if X_border and not O_border:
+                territory_color = colormap['black']
+            elif O_border and not X_border:
+                territory_color = colormap['white']
+            else:
+                territory_color = UNKNOWN  # dame, or seki
+            place_stones(working_board, territory_color, territory)
+        return np.count_nonzero(working_board == colormap['black']) - np.count_nonzero(working_board == colormap['white']) - self.komi
 
     def is_move_suicidal(self, coord):
         b = self.board
@@ -99,10 +149,13 @@ class GoStatus(object):
             return True
         r, c = coord
         if b[r,c]!=colormap['empty']: 
+            print('nonempty')
             return False
         if coord == self.ko:
+            print('ko')
             return False
         if self.is_move_suicidal(coord):
+            print('suic')
             return False
         return True
 
