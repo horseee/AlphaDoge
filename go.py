@@ -35,10 +35,12 @@ class GoStatus(object):
         self.board = np.zeros(shape=(9,9))
         self.to_play = colormap['black']
         self.ko=None
+    def __repr__(self):
+        return '%s'%self.board
 
     def __getitem__(self,key):
         return self.board[key]
-        
+
     def get_status(self):
         return self.board
 
