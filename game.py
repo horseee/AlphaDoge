@@ -45,13 +45,18 @@ class GoGame(QWidget):
 		if QMouseEvent.button() == Qt.LeftButton:
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
-			if self.is_empty(row, col):
+			if self.is_empty(row, col) and self.is_inboard(row,col):
 				print('ACTION: (%d, %d)'%(row, col)) 
 				self.act(row,col)
 				self.update()	
-
 	def is_empty(self,r,c):
 		return self.status.board[r,c]==colormap['empty']
+
+	def is_inboard(self, r,c):
+		if r>=0 and r<9 and c>=0 and c<9:
+			return True
+		else:
+			return False
 
 	########   GUI   #######
 	def paintEvent(self,event):
