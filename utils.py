@@ -20,7 +20,7 @@ def coord_sgf2tuple(coord):
 
 
 colormap = {
-        'white': 2,
-        'black': 1,
+        'white': 1,
+        'black': -1,
         'empty': 0
 }

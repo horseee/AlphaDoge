@@ -36,7 +36,7 @@ class BatchLoader(object):
 		X = []
 		y = []
 		for i in range(len(self.sgf_list)):
-			X.append(self.sgf_list[i].status.board)				# current board
+			X.append(self.sgf_list[i].status.board * self.sgf_list[i].status.to_play)				# current board
 			y.append(self.sgf_list[i].peek_next_action()) # the next action
 			self.sgf_list[i].next()
 		return np.array(X), y 

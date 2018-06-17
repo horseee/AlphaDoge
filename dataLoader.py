@@ -94,7 +94,7 @@ if __name__=='__main__':
     #print(sgf_file.to(-2)) # 跳到倒数第二个状态
     while not sgf_file.end:
         print(sgf_file.peek_next_action(),sgf_file.to_play())
-        print(sgf_file.next().board.shape)
+        print(sgf_file.next())
 
 
     
