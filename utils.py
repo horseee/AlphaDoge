@@ -9,6 +9,7 @@ def coord_flat2tuple(coord):
     return coord//9, coord%9
 
 def coord_tuple2flat(coord):
+    if coord==None: return 81
     return coord[0]*9+coord[1]
 
 def coord_sgf2tuple(coord):
