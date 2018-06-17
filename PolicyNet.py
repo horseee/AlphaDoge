@@ -12,12 +12,16 @@ class PolicyNet(object):
         self.initialize_graph()
 
     def run(self, inputs):
-        return self.sess.run([self.output], {self.input: inputs})
-    
+        probs, value = self.sess.run([self.probs, self.value], {self.input: inputs})
+        return probs[0], value[0]
+
     def initialize_graph(self):
         with self.sess.graph.as_default():
             self.input = get_reference_input() # placeholder
-            self.output = model_fn(self.input) # output tf tensor
+            output = model_fn(self.input) # output tf tensor
+            self.value = output['value']
+            self.probs = output['probs']
+
             if self.ckpt != None:
                 self.initialize_weights(self.ckpt)
             else: self.sess.run(tf.global_variables_initializer())
@@ -35,9 +39,12 @@ def get_reference_input():
                            [None, bsize, bsize, feature_num],
                            name='pos_tensor')                      
 def model_fn(x):
-    return tf.layers.conv2d(x, filters=64, kernel_size=3, strides=1, padding='SAME')
+    value = tf.layers.dense(tf.layers.flatten(x), units=1)
+    probs = tf.layers.dense(tf.layers.flatten(x), units=82)
+    return {'probs': probs,'value': value}
 
 if __name__=='__main__':
     pn = PolicyNet()
-    out = pn.run(np.ones(shape=(1,9,9,1)))
-    print(out)
+    probs, value = pn.run(np.ones(shape=(1,9,9,1)))
+    print(probs[0].reshape(9,9))
+    print(value[0])

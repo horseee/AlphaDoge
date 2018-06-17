@@ -45,7 +45,7 @@ class SGFLoader(object):
     def to_play(self):
         return self.status.to_play
 
-    def state(self):        # 返回状态
+    def get_status(self):        # 返回状态
         return self.status
 
     def next(self):         # 进入下一个状态
