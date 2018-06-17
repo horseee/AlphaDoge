@@ -35,7 +35,7 @@ class MCTSNode(object):
             #self.N+=1
             if cur.is_expanded==False: break  # reach a leaf, then selection finishes
             best_move = np.argmax(cur.child_action_score) # select the best action
-            print(self.N, " select child: ", best_move)
+            #print(self.N, " select child: ", best_move)
             cur = cur.add_child(best_move) # expand
         return cur
     

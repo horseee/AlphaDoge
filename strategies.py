@@ -1,6 +1,6 @@
 import go, mcts, utils
 import time
-
+import numpy as np
 from utils import *
 bSize = 9
 class MCTSPlayer(object):
@@ -12,7 +12,7 @@ class MCTSPlayer(object):
         self.result = 0
         self.timed_match=timed_match
         self.search_n = search_n
-        if two_plgit ayer_mode:
+        if two_player_mode:
             self.temp_threshold = -1
         else:
             self.temp_threshold = (bSize**2 // 12)//2 *2
@@ -33,10 +33,15 @@ class MCTSPlayer(object):
             cur_n = self.root.N
             while self.root.N < cur_n + self.search_n:
                 leaf = self.tree_search()
-                print(leaf.status)
+                #print(leaf.status)
             print("%d: Searched %d times in %s seconds\n\n" % (
                     status.n, self.search_n, time.time() - start))
         return self.pick_move()
+
+    def play_move(self, coord):
+        self.root = self.root.add_child(coord_tuple2flat(coord))
+        self.status = self.root.status
+        del self.root.parent.children
 
     def pick_move(self):
         pick = np.argmax(self.root.child_N)

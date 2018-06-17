@@ -20,6 +20,7 @@ class SGFLoader(object):
         self.total = len(self.nodes)              # 总的状态数
         self.step = 0                             # 目前是第step步                  
         self.cur = self.root                      # 当前所处的树节点
+        self.value = 1 if self.root.properties['RE'][0]=='W' else 'B'   # 白方赢为1
         #self.board = np.zeros((9,9))
         self.status = GoStatus()
         self.end=False
@@ -92,9 +93,10 @@ if __name__=='__main__':
     #print(sgf_file.end)    # 是否结束
     #print(sgf_file.to(2))  # 跳到第二个状态
     #print(sgf_file.to(-2)) # 跳到倒数第二个状态
-    while not sgf_file.end:
-        print(sgf_file.peek_next_action(),sgf_file.to_play())
-        print(sgf_file.next())
+    print(sgf_file.root.properties)
+    #while not sgf_file.end:
+    #    print(sgf_file.peek_next_action(),sgf_file.to_play())
+    #    print(sgf_file.next())
 
 
     
