@@ -1,13 +1,13 @@
 import argparse
 import tensorflow as tf
 from model import policy_value_net
-
+from batchLoader import BatchLoader
 
 if __name__ == '__main__':
 
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--learning_rate',type=float,default=0.00003,help='learning rate')
-	parser.add_argument('--epochs',type=int,default=100,help='epoch number')
+	parser.add_argument('--rounds',type=int,default=30000,help='rounds number')
 	parser.add_argument('--ckpt',type=str,default='checkpoints/model',help='epoch number')
 	parser.add_argument('--batch_size',type=int,default=16,help='batch size')
 	args = parser.parse_args()
@@ -41,6 +41,9 @@ if __name__ == '__main__':
 	else: 
 		print('[!] No checkpoints!')
 
+
+	for r in range(args.rounds):
+		pass
 
 
 	#for ep in range(epoch):
