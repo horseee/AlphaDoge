@@ -88,8 +88,8 @@ class GoStatus(object):
 
     def play_move(self, coord, color=None):
         if self.is_game_over(): 
-            print('Game Over!')
-            print(self.get_score())
+            #print('Game Over!')
+            #print(self.get_score())
             return False
 
         b = self.board

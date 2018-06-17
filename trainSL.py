@@ -1,10 +1,14 @@
+# -*- coding: utf-8 -*-  
+
 import argparse
 import tensorflow as tf
 from model import policy_value_net
 from batchLoader import BatchLoader
+import os
+import numpy as np
 
 def Get_One_Hot(by, player):
-	label_by = np.zeros( len(by) , 9*9+1)
+	label_by = np.zeros( [len(by) , 9*9+1])
 	for i in range(len(by)):
 		if by[i] == None:
 			label_by[i][81] = player[i]
@@ -15,9 +19,11 @@ def Get_One_Hot(by, player):
 
 if __name__ == '__main__':
 
+	os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument('--learning_rate',type=float,default=0.00003,help='learning rate')
-	parser.add_argument('--epoch',type=int,default=30000,help='epoch number')
+	parser.add_argument('--epoch',type=int,default=300,help='epoch number')
 	parser.add_argument('--ckpt',type=str,default='checkpoints/model',help='epoch number')
 	parser.add_argument('--batch_size',type=int,default=16,help='batch size')
 	args = parser.parse_args()
@@ -45,21 +51,25 @@ if __name__ == '__main__':
 	sess.run(tf.global_variables_initializer())
 	saver =  tf.train.Saver(tf.global_variables())
 
-	if os.path.exists('checkpoints'):
-		saver.restore(sess, args.ckpt)
-		print('[!] Model restored from %s'%(args.ckpt))
-	else: 
+	try:
+		if os.path.exists('checkpoints'):
+			saver.restore(sess, args.ckpt)
+			print('[!] Model restored from %s'%(args.ckpt))
+		else: 
+			print('[!] No checkpoints!')
+	except:
 		print('[!] No checkpoints!')
 
 	batch_train = BatchLoader(dir='train')
 	batch_validation = BatchLoader(dir='validation', batch_size = 1)
-	for ep in range(epoch):
+	for ep in range(args.epoch):
 		total_loss = []
 	
-		while !batch_train.end_batch():
+		while not batch_train.end_batch():
 			bX, by, player = batch_train.get_batch()
 			label_by = Get_One_Hot(by, player)
-			_, cur_loss = sess.run([opt, loss], {data_input: bX, label_input: label_by})
+			bX = np.reshape(bX, [-1, 9, 9, 1])
+			_, cur_loss = sess.run([opt, policy_loss], {data_input: bX, label_input: label_by})
 			total_loss.append(cur_loss)
 		
 		print('[*] epoch %d, average loss = %f'%(ep, np.mean(total_loss)))
@@ -70,21 +80,16 @@ if __name__ == '__main__':
 		correct = 0
 		total_game = 0
 
-		while !batch_validation.end_batch():
+		while not batch_validation.end_batch():
 			bX, by, player = batch_validation.get_batch()
-            res = sess.run([logits], {data_input: bX})
-            predicts  = np.argmax(res,axis=1)
-            if by == None and predicts == 81:
-            	correct = correct + 1
-            else if by[0] * 9 + by[1] == predicts:
-            	correct = correct + 1
-            total_game += 1
-            
-        print("[!] %d validation data, accuracy = %f"%(total_game, correct / total_game)
-
-
-
-
-
-
+			bX = np.reshape(bX, [-1, 9, 9, 1])
+			res = sess.run([logits], {data_input: bX})
+			predicts  = np.argmax(res,axis=1)
+			if by == None and predicts == 81:
+				correct = correct + 1
+			elif by[0] * 9 + by[1] == predicts:
+				correct = correct + 1
+			total_game += 1
+			
+		print("[!] %d validation data, accuracy = %f"%(total_game, correct / total_game))
 

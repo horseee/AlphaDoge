@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-  
+
 import os, sys 
 import sgf
 import numpy as np
