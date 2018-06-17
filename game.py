@@ -82,7 +82,7 @@ class GoGame(QWidget):
 		#
 		self._qp.setBrush(bgColor)
 		b = QBrush()
-		b.setTexture(QPixmap('images.jpg'))
+		b.setTexture(QPixmap('texture.jpg'))
 		self._qp.setBrush(b)
 		self._qp.drawRect(self.gridSize,self.gridSize, (self._size)*self.gridSize,(self._size)*self.gridSize)
 	

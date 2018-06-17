@@ -59,7 +59,7 @@ class GoStatus(object):
         self.n=0
         self.recent = []
         self.komi = komi
-
+    
     def __repr__(self):
         return '%s'%self.board
 
@@ -76,6 +76,15 @@ class GoStatus(object):
         return (len(self.recent) >= 2
                 and self.recent[-1] is None
                 and self.recent[-2] is None)
+
+    def get_legal_moves(self):
+        legal_map = np.zeros((9*9+1))
+        legal_map[-1] = 1
+        for i in range(9):
+            for j in range(9):
+                if self.is_move_legal((i,j)):
+                    legal_map[i*9+j] = 1
+        return legal_map
 
     def play_move(self, coord, color=None):
         if self.is_game_over(): 
@@ -149,13 +158,13 @@ class GoStatus(object):
             return True
         r, c = coord
         if b[r,c]!=colormap['empty']: 
-            print('nonempty')
+            #print('nonempty')
             return False
         if coord == self.ko:
-            print('ko')
+            #print('ko')
             return False
         if self.is_move_suicidal(coord):
-            print('suic')
+            #print('suic')
             return False
         return True
 

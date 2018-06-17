@@ -5,6 +5,7 @@
 #    return p//9, p%9
 
 def coord_flat2tuple(coord):
+    if coord==81: return None
     return coord//9, coord%9
 
 def coord_tuple2flat(coord):
