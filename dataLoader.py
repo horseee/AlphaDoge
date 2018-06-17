@@ -24,9 +24,12 @@ class SGFLoader(object):
         self.status = GoStatus()
         self.end=False
 
+    def peek_next_action(self):
+        return self.action_n(self.step+1)
+
     def action_n(self, n):  # 返回第n个落子 (row,col)
         assert n>0
-        if n>self.total: return None
+        if n>=self.total: return None
         return coord_sgf2tuple(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
 
     def reset(self):        # 重置棋盘
@@ -38,6 +41,9 @@ class SGFLoader(object):
 
     def is_end(self):       # 判断是否结束
         return self.end
+
+    def to_play(self):
+        return self.status.to_play
 
     def state(self):        # 返回状态
         return self.status
@@ -69,24 +75,26 @@ class SGFLoader(object):
         self.cur = self.cur.next
         self.step+=1
         player = colormap['black'] if self.step%2==1 else colormap['white']
-        r, c = coord_sgf2tuple( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
-        if r!=None:
-            #self.board[r,c] = player
-            self.status.play_move((r,c))
-            #self.check_capture(r,c)
+        coord = coord_sgf2tuple( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
+        #self.board[r,c] = player
+        self.status.play_move(coord)
+        #self.check_capture(r,c)
         #print(self.board)
         return self.status
 
 # 2 white, 1 black, 0 empty
 if __name__=='__main__':
     sgf_file = SGFLoader('train/2015/11/10/1.sgf')
-    print(sgf_file.to(10))
-    print(sgf_file.end)
-    print(sgf_file.next())
-    print(sgf_file.to(-1))
-    print(sgf_file.end)
-    print(sgf_file.to(2))
-    print(sgf_file.to(-2))
+    #print(sgf_file.to(10)) # 跳到第10个状态
+    #print(sgf_file.end)    # 是否结束
+    #print(sgf_file.next()) # 下一个状态
+    #print(sgf_file.to(-1)) # 倒数第一个状态
+    #print(sgf_file.end)    # 是否结束
+    #print(sgf_file.to(2))  # 跳到第二个状态
+    #print(sgf_file.to(-2)) # 跳到倒数第二个状态
+    while not sgf_file.end:
+        print(sgf_file.peek_next_action(),sgf_file.to_play())
+        print(sgf_file.next())
 
 
     

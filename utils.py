@@ -11,7 +11,7 @@ def coord_tuple2flat(coord):
     return coord[0]*9+coord[1]
 
 def coord_sgf2tuple(coord):
-    if coord=='': return None, None
+    if coord=='': return None
     #print(coord)
     r = ord(coord[1])-ord('a')
     c = ord(coord[0])-ord('a')
