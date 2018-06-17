@@ -35,17 +35,19 @@ class BatchLoader(object):
 		self.update()
 		X = []
 		y = []
+		player = []
 		for i in range(len(self.sgf_list)):
 			X.append(self.sgf_list[i].status.board * self.sgf_list[i].status.to_play)				# current board
 			y.append(self.sgf_list[i].peek_next_action()) # the next action
+			player.append(-1 * self.sgf_list[i].status.to_play)
 			self.sgf_list[i].next()
-		return np.array(X), y 
+		return np.array(X), y, player
 
 	def reset_batch(self):
 		self.sgf_list = []
 		self.file_idx = 0
 
-	def batch_end(self):
+	def end_batch(self):
 		if self.file_idx + self.batch_size >= len(self.filenames):
 			return True
 		else:
@@ -53,8 +55,7 @@ class BatchLoader(object):
 
 #if __name__=='__main__':
 #	batch = BatchLoader(dir='train')
-#	for i in range(20):
-#		bX, by = batch.get_batch()
-#		print(bX)
+#	for i in range(10):
+#		bX, by, player = batch.get_batch()
 #		print(by)
 	
