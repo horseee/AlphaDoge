@@ -15,40 +15,40 @@ class SGFLoader(object):
         self.filepath = filename
         with open(filename, 'rt') as f:
             self.sgf = sgf.parse(f.read())
-        self.nodes = self.sgf.children[0].nodes
-        self.root = self.sgf.children[0].root
-        self.total = len(self.nodes)
-        self.step = 0
-        self.cur = self.root 
+        self.nodes = self.sgf.children[0].nodes   # 保存了所有落子的记录
+        self.root = self.sgf.children[0].root     # 状态节点（编号0） 
+        self.total = len(self.nodes)              # 总的状态数
+        self.step = 0                             # 目前是第step步                  
+        self.cur = self.root                      # 当前所处的树节点
         #self.board = np.zeros((9,9))
         self.status = GoStatus()
         self.end=False
 
-    def action_n(self, n):
+    def action_n(self, n):  # 返回第n个落子 (row,col)
         assert n>0
         if n>self.total: return None
         return coord_sgf2tuple(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
 
-    def reset(self):
+    def reset(self):        # 重置棋盘
         self.step = 0
         self.cur = self.root
         #self.board = np.zeros((9,9))
         self.status.reset()
         self.end=False
 
-    def is_end(self):
+    def is_end(self):       # 判断是否结束
         return self.end
 
-    def state(self):
+    def state(self):        # 返回状态
         return self.status
 
-    def next(self):
+    def next(self):         # 进入下一个状态
         return self._next()
     
-    def to(self, n):
+    def to(self, n):        # 直接到达状态n （0为空棋盘）
         return self._to(n)
     
-    def __getitem__(self, key):
+    def __getitem__(self, key): # sgf[2] 表示返回第2个落子
         return self.action_n(key)
 
     def _to(self, n):
