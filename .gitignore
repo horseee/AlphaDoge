@@ -1,2 +1,6 @@
 *.DS_Store
 train
+__pycache__
+.vscode
+*.pdf
+*.zip
