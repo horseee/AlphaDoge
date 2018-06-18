@@ -29,15 +29,21 @@ class App(QWidget):
 		self.digit_clock.resetTime()
 		self.update()
 
+	def time_out(self):
+		self.env.pass_move()
+
 	def initUI(self):
 		assert(boardFrac>=0.5)
 		self.setWindowTitle(self.title)
 		self.setGeometry(self.left, self.top,self.width, self.height)
 		cond = QLabel("TO PLAY: BLACK")
+
 		self.digit_clock = DigitClock(  size=(0.9*self.width*(1-boardFrac),
-															0.9*self.width*(1-boardFrac)/2), digits=8 )
+															0.9*self.width*(1-boardFrac)/2), digits=8 ,handler=self.time_out,timeLimit=60)			
 		doge = AlphaDoge(ckpt,seconds_per_move=seconds_per_move,timed_match=timed_match,search_n=search_n)
 		self.env = GoGame(size=9, oppo_thread=doge,width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95, condition=cond, reset_clock=self.digit_clock.resetTime)
+		
+		
 		self.layout = QGridLayout()
 		self.layout.setColumnStretch(0, math.ceil(boardFrac/(1-boardFrac)))
 		self.layout.addWidget(self.env,0,0)

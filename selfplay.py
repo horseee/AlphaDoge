@@ -106,7 +106,7 @@ if __name__=='__main__':
                 mean_loss = []
                 mean_p = []
                 mean_v = []
-                saver.save(sess, rl_ckpt)
+            saver.save(sess, rl_ckpt)
 
 
     #savemat('selfplay/'+file_name, {'X': X, 'p':p, 'v':v}, appendmat=False)
