@@ -112,9 +112,9 @@ if __name__ == '__main__':
                     mean_p = []
                     mean_v = []
                     c = 0
-                if c%1000==0:
-                    saver.save(sess, args.ckpt)
-                    print('Model saved!')
+                #if c%10000==0:
+                #    saver.save(sess, args.ckpt)
+                #    print('Model saved!')
             saver.save(sess, args.ckpt)
-            print('Model saved!')
+            print('[*] epoch %d: Model saved!'%ep)
 
