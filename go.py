@@ -100,7 +100,9 @@ class GoStatus(object):
             self.recent.append(coord)
             self.change_player()
             return True
+
         if not self.is_move_legal(coord):
+            #print('not legal')
             return False
         poential_ko = is_ko(self.board, coord)
         b[coord]=color

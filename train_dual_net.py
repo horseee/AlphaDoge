@@ -66,7 +66,24 @@ if __name__ == '__main__':
         print('[!] No checkpoints!')
 
     dataset_path = glob.glob('./data/*.mat',recursive=False)
+    valid_path = dataset_path[-1]
+    dataset_path = dataset_path[:-1]
     batch_size = args.batch_size
+
+    valid_size = 4000
+    valid_data = loadmat(valid_path)
+    valid_X = valid_data['X'][:valid_size]
+    valid_p = valid_data['p'][0][:valid_size]
+    valid_v = valid_data['v'][0][:valid_size]
+
+    shuffle_idx = list(range(len(valid_X)))
+    random.shuffle(shuffle_idx)
+    valid_X = valid_X[shuffle_idx].reshape(-1,9,9,1)
+    valid_p = valid_p[shuffle_idx]
+    valid_v = valid_v[shuffle_idx].reshape(-1,1)
+    #valid_p_onehot = to_one_hot(valid_p)
+
+
     for i in range(len(dataset_path)):
         data = loadmat(dataset_path[i])
         X = data['X']
@@ -82,6 +99,7 @@ if __name__ == '__main__':
         #print(p_one_hot.shape)
         #brea
         c = 0
+        va = 0
         for ep in range(args.epoch):
             mean_loss = []
             mean_p = []
@@ -101,7 +119,7 @@ if __name__ == '__main__':
                     batch_v = v[itr:itr+batch_size]
 
                 _, cur_loss, p_loss, v_loss = sess.run([opt, loss, policy_loss, value_loss], {data_input: batch_X, p_input: batch_p, v_input: batch_v})
-                c+=1
+                
                 mean_loss.append(cur_loss)
                 mean_p.append(p_loss)
                 mean_v.append(v_loss)
@@ -112,9 +130,23 @@ if __name__ == '__main__':
                     mean_p = []
                     mean_v = []
                     c = 0
-                #if c%10000==0:
-                #    saver.save(sess, args.ckpt)
-                #    print('Model saved!')
+                    saver.save(sess, args.ckpt)
+    
+                if va%1000==0:
+                    va = 0
+                    print('[!] Validation, %d examples'%valid_size)
+                    p_out, v_out = sess.run([policy_logits, value_out], {data_input: valid_X})
+                    preds = np.argmax(p_out,axis=1)
+                    pred_err = 0
+                    for i in range(valid_size):
+                        if preds[i]!=valid_p[i]:
+                            pred_err+=1
+                    print("Accuracy: %f"%((valid_size-pred_err)/valid_size))
+                c+=1
+                va+=1
+                        
             saver.save(sess, args.ckpt)
             print('[*] epoch %d: Model saved!'%ep)
 
+
+        valid_path
