@@ -4,8 +4,16 @@ from PyQt5.QtCore import QSize
 from game import GoGame, colormap, DigitClock
 import math
 
+
 boardFrac = 0.85
-from Opponents import RandomOppo
+
+seconds_per_move=5
+timed_match=False
+search_n=800
+ckpt = 'checkpoints/model'
+
+
+from Opponents import randomOppo, AlphaDoge
 class App(QWidget):
 	def __init__(self):
 		super().__init__()
@@ -28,7 +36,8 @@ class App(QWidget):
 		cond = QLabel("TO PLAY: BLACK")
 		self.digit_clock = DigitClock(  size=(0.9*self.width*(1-boardFrac),
 															0.9*self.width*(1-boardFrac)/2), digits=8 )
-		self.env = GoGame(size=9, opponent=RandomOppo(),width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95, condition=cond, reset_clock=self.digit_clock.resetTime)
+		doge = AlphaDoge(ckpt,seconds_per_move=seconds_per_move,timed_match=timed_match,search_n=search_n)
+		self.env = GoGame(size=9, oppo_thread=doge,width=self.width*boardFrac*0.95, height=self.height*boardFrac*0.95, condition=cond, reset_clock=self.digit_clock.resetTime)
 		self.layout = QGridLayout()
 		self.layout.setColumnStretch(0, math.ceil(boardFrac/(1-boardFrac)))
 		self.layout.addWidget(self.env,0,0)
@@ -47,6 +56,8 @@ class App(QWidget):
 		restart_buttom.clicked.connect(self.restart)
 		restart_buttom.setMinimumSize(QSize(0.9*self.width*(1-boardFrac),
 															0.9*self.width*(1-boardFrac)/2))
+															
+															
 		sublayout.addWidget(restart_buttom)
 
 		sublayout.addWidget(pass_buttom)

@@ -8,11 +8,10 @@ import gym
 
 from utils import *
 from go import *
-from Opponents import decisionThread
 
 class GoGame(QWidget):
 	# init class
-	def __init__(self, size=9, opponent=None ,width=800, height=800, condition=None, reset_clock=None):
+	def __init__(self, size=9, oppo_thread=None ,width=800, height=800, condition=None, reset_clock=None):
 		super(GoGame, self).__init__()
 		# GUI
 		self.status = GoStatus()
@@ -24,18 +23,21 @@ class GoGame(QWidget):
 		self.latest = None
 		self.condition = condition
 		self.reset_clock = reset_clock
-		self.oppo_thread = decisionThread(self.status)
+		self.oppo_thread = oppo_thread
 		self.oppo_thread.tuple_signal.connect(self._opponent_done)
 		self.user = colormap['black']
+		self.is_resign=False
 		# status
 		
-		self.opponent = opponent
 		self.reset()
 
 	def _opponent_done(self, coord):
 		if coord==(-1,-1): coord=None
 		self.status.play_move(coord)
+		self.oppo_thread.play_move(coord)
 		self.latest = coord
+		print("[-] Opponent: ", coord)
+		print('\n')
 		self.update_cond()
 		self.update()
 
@@ -53,13 +55,21 @@ class GoGame(QWidget):
 
 	def act(self, coord):
 		""" take action at (r,c) """
+		if self.is_resign: return False
 		#observation, reward, done, info = self.env.step(coord_doge2gym(r,c))
 		success = self.status.play_move(coord)
-		print(success)
-		if success==True and self.opponent!=None:
+		#print(success)
+		if success==True:
+			if self.oppo_thread.player.should_resign():
+				self.is_resign=True
+				winner = 'BLACK' if self.user==colormap['black'] else 'WHITE'
+				self.update_cond(winner)
+				print("Game Over! The winner is %s"%(winner))
+				return True
+	
 			self.latest = coord
 			self.update_cond()
-			self.oppo_thread.set_status(self.status)
+			self.oppo_thread.play_move(coord) #set_status(self.status)
 			self.oppo_thread.start()
 			#move = self.opponent.make_policy(self.status)
 			#self.status.play_move(move)
@@ -84,7 +94,7 @@ class GoGame(QWidget):
 			row = (int)(QMouseEvent.y()//self.gridSize)-1
 			col = (int)(QMouseEvent.x()//self.gridSize)-1
 			if self.user==self.status.to_play and self.is_inboard((row,col)) and self.is_empty((row, col)):
-				print('ACTION: (%d, %d)'%(row, col)) 
+				print('[*] ACTION: (%d, %d)'%(row, col)) 
 				self.act((row,col))
 				self.update()	
 
@@ -99,6 +109,7 @@ class GoGame(QWidget):
 			return False
 
 	def pass_move(self):
+		if self.is_resign: return
 		if self.status.to_play==self.user:
 			self.act(None)
 			if self.status.is_game_over():
@@ -107,6 +118,13 @@ class GoGame(QWidget):
 				if score<0: winner='WHITE'
 				self.update_cond(winner)
 				print("Game Over! The winner is %s"%(winner))
+
+			if self.oppo_thread.player.should_resign():
+				self.is_resign=True
+				winner = 'BLACK' if self.user==colormap['black'] else 'WHITE'
+				self.update_cond(winner)
+				print("Game Over! The winner is %s"%(winner))
+
 				#self.reset()
 		#print('PASS')
 

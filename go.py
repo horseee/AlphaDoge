@@ -97,7 +97,7 @@ class GoStatus(object):
         opposite = get_opposite(color)
         if coord==None:
             self.n+=1
-            self.recent.append(coord)
+            self.recent.append(None)
             self.change_player()
             return True
 
@@ -142,7 +142,7 @@ class GoStatus(object):
             else:
                 territory_color = UNKNOWN  # dame, or seki
             place_stones(working_board, territory_color, territory)
-        return np.count_nonzero(working_board == colormap['black']) - np.count_nonzero(working_board == colormap['white']) - self.komi
+        return np.count_nonzero(working_board == colormap['white']) + self.komi - np.count_nonzero(working_board == colormap['black']) 
 
     def is_move_suicidal(self, coord):
         b = self.board

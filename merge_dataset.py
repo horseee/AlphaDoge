@@ -28,7 +28,7 @@ def merge_dataset(dir='train', to_file='data/data'):
             f_id+=1
 
     if len(X)>0: # save the rest
-         savemat(to_file+'_%d'%f_id, {'X':X,'p':p,'v':v})
+         savemat(to_file+'_%d'%f_id, {'X':X,'p':p,'v':v},appendmat=False)
          print('saved as %s_%d.mat'%(to_file,f_id))
     
 
