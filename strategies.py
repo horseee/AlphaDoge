@@ -65,8 +65,7 @@ class MCTSPlayer(object):
             value = 1 if leaf.status.get_score()>0 else -1
             leaf.backup(value, self.root)     
         else:
-
-            net_input = leaf.status.board.reshape(-1,bSize,bSize,1) * self.player_mode if self.player_mode!=0 else leaf.status.to_play
+            net_input = leaf.status.board.reshape(-1,bSize,bSize,1) * (self.player_mode if self.player_mode!=0 else leaf.status.to_play)
             move_probs, value = self.network.run(net_input)
             leaf.backup_unfinished(move_probs,value,self.root)
         return leaf

@@ -19,6 +19,16 @@ def coord_sgf2tuple(coord):
     c = ord(coord[0])-ord('a')
     return (r, c)
 
+def to_one_hot(p):
+    if isinstance(p, int):
+        one_hot = np.zeros((9*9+1))
+        one_hot[p] = 1
+        return one_hot
+    else: 
+        one_hot = np.zeros((len(p),9*9+1))
+        for i in range(len(p)):
+            one_hot[i,p[i]] = 1
+        return one_hot
 
 def logits2prob(logits):
     probs = np.exp(logits)

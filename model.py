@@ -23,11 +23,11 @@ def policy_value_net(inputs):
         x = tf.layers.conv2d(inputs=x, filters=filters, kernel_size=kernel_size, padding='SAME', strides=strides)
 
         x = x + short_cut
-        print(x.shape)
+        #print(x.shape)
         return x
     with tf.variable_scope("share"):
         x = tf.layers.batch_normalization(inputs)
-        print(x.shape)
+        #print(x.shape)
         x = tf.layers.conv2d(inputs=x, filters=filters, kernel_size=kernel_size, padding='SAME', strides=strides)
         for i in range(res_layer):
             x = ResBlock(x, filters, kernel_size, strides, dropout_rate)
@@ -38,7 +38,7 @@ def policy_value_net(inputs):
         policy = tf.nn.relu(policy)
         policy = tf.layers.flatten(policy)
         policy_logits = tf.layers.dense(policy, units=9*9+1) # the last one is PASS action
-        print("Policy: %s"%policy_logits.shape)
+        #print("Policy: %s"%policy_logits.shape)
 
     with tf.variable_scope("value"):
         value = tf.layers.conv2d(inputs=x, filters=1, kernel_size=1, padding='SAME', strides=1)
@@ -49,7 +49,7 @@ def policy_value_net(inputs):
         value = tf.nn.relu(value)
         value = tf.layers.dense(value, units=1)
         value_out = tf.nn.tanh(value)
-        print("Value: %s"%value_out.shape)
+        #print("Value: %s"%value_out.shape)
         
 
     return {'policy': policy_logits, 'value': value_out}

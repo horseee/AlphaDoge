@@ -20,8 +20,9 @@ def to_one_hot(p):
         return one_hot
 
 
-if __name__ == '__main__':
 
+
+if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "2"
    
     parser = argparse.ArgumentParser()
