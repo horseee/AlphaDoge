@@ -58,6 +58,9 @@ class MCTSPlayer(object):
             leaf.backup_unfinished(move_probs,value,self.root)
         return leaf
 
+    def record_play(self):
+        sgf_head = "(;GM[1]FF[4]CA[UTF-8]\nRU[Chinese]SZ[9]KM[7.0]TM[300]\nPW[Gnugo-3.7.10-a1]PB[CrazyStone-0002]WR[1800]BR[2693]DT[2015-12-03]PC[(CGOS) 9x9 Computer Go Server]RE[B+4.0]GN[14411]"
+
 if __name__=='__main__':
     from PolicyNet import PolicyNet
     from go import GoStatus

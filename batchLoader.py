@@ -53,9 +53,10 @@ class BatchLoader(object):
 		else:
 			return False
 
-#if __name__=='__main__':
-#	batch = BatchLoader(dir='train')
-#	for i in range(10):
-#		bX, by, player = batch.get_batch()
-#		print(by)
+if __name__=='__main__':
+	batch = BatchLoader(dir='train')
+	print(batch.filenames)
+	for i in range(10):
+		bX, by, player = batch.get_batch()
+		#print(by)
 	

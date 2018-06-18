@@ -19,7 +19,6 @@ def coord_sgf2tuple(coord):
     c = ord(coord[0])-ord('a')
     return (r, c)
 
-
 colormap = {
         'white': 1,
         'black': -1,

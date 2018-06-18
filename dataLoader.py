@@ -22,7 +22,7 @@ class SGFLoader(object):
         self.total = len(self.nodes)              # 总的状态数
         self.step = 0                             # 目前是第step步                  
         self.cur = self.root                      # 当前所处的树节点
-        self.value = 1 if self.root.properties['RE'][0]=='W' else 'B'   # 白方赢为1
+        self.value = 1 if self.root.properties['RE'][0]=='W' else -1   # 白方赢为1
         #self.board = np.zeros((9,9))
         self.status = GoStatus()
         self.end=False
@@ -32,8 +32,13 @@ class SGFLoader(object):
 
     def action_n(self, n):  # 返回第n个落子 (row,col)
         assert n>0
-        if n>=self.total: return None
-        return coord_sgf2tuple(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
+        if n>=self.total: return -1
+        #print(self.nodes[n].properties)
+        #print(len(self.nodes[n].properties.keys()))
+        if len(self.nodes[n].properties.keys())!=2: 
+            return None
+        else:
+            return coord_sgf2tuple(self.nodes[n].properties['B' if n%2==1 else 'W'][0])
 
     def reset(self):        # 重置棋盘
         self.step = 0
@@ -78,7 +83,10 @@ class SGFLoader(object):
         self.cur = self.cur.next
         self.step+=1
         player = colormap['black'] if self.step%2==1 else colormap['white']
-        coord = coord_sgf2tuple( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
+        if len(self.cur.properties.keys())!=2: 
+            coord = None
+        else:
+            coord = coord_sgf2tuple( self.cur.properties['B' if self.step%2==1 else 'W'][0] )
         #self.board[r,c] = player
         self.status.play_move(coord)
         #self.check_capture(r,c)

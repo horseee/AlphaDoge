@@ -24,7 +24,5 @@ def play(network):
             break
     return player
         
-        
-        
 if __name__=='__main__':
     play(PolicyNet())
