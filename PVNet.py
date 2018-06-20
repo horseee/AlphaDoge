@@ -12,8 +12,9 @@ class PVNet(object):
         self.initialize_graph()
 
     def run(self, inputs):
-        p, v = self.sess.run([self.policy, self.value], {self.input: inputs})
-        return logits2prob(p[0]), v[0]
+        with self.sess.graph.as_default():
+            p, v = self.sess.run([self.policy, self.value], {self.input: inputs})
+            return logits2prob(p[0]), v[0][0]
 
     def initialize_graph(self):
         with self.sess.graph.as_default():

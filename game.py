@@ -44,10 +44,10 @@ class GoGame(QWidget):
 	def __getitem__(self,key):
 		return self.status.board[key]
 
-	def update_cond(self, winner=None):
+	def update_cond(self, winner=None, score=0):
 		self.reset_clock()
 		if winner!=None:
-			self.condition.setText('Game Over, winner is %s'%winner)
+			self.condition.setText('%s WIN (score: %d)'%(winner,score))
 		elif self.status.to_play==colormap['black']:
 			self.condition.setText('TO PLAY: BLACK')
 		elif self.status.to_play==colormap['white']:
@@ -63,7 +63,7 @@ class GoGame(QWidget):
 			if self.oppo_thread.player.should_resign():
 				self.is_resign=True
 				winner = 'BLACK' if self.user==colormap['black'] else 'WHITE'
-				self.update_cond(winner)
+				self.update_cond(winner, 0)
 				print("Game Over! The winner is %s"%(winner))
 				return True
 	
@@ -79,8 +79,10 @@ class GoGame(QWidget):
 
 	# reset board
 	def restart(self):
-		if self.user==self.status.to_play:
+		if self.status.to_play==self.user:
 			self.reset()
+			self.oppo_thread.reset()
+
 
 	def reset(self):
 		self.status.reset()
@@ -110,20 +112,22 @@ class GoGame(QWidget):
 
 	def pass_move(self):
 		if self.is_resign: return
+
 		if self.status.to_play==self.user:
 			self.act(None)
 			if self.status.is_game_over():
 				score = self.status.get_score()
 				winner = 'BLACK'
-				if score<0: winner='WHITE'
-				self.update_cond(winner)
-				print("Game Over! The winner is %s"%(winner))
+				if score>0: winner='WHITE'
+				self.update_cond(winner, score)
+				print("%s WIN"%(winner))
 
 			if self.oppo_thread.player.should_resign():
 				self.is_resign=True
+				self.status.change_player()
 				winner = 'BLACK' if self.user==colormap['black'] else 'WHITE'
-				self.update_cond(winner)
-				print("Game Over! The winner is %s"%(winner))
+				self.update_cond(winner, 0)
+				print("%s WIN"%(winner))
 
 				#self.reset()
 		#print('PASS')

@@ -55,7 +55,10 @@ class AlphaDoge(QThread):
     
     def play_move(self, coord):
         self.player.play_move(coord)
-        
+
+    def reset(self):
+        self.player.reset()
+    
     def __del__(self):
         self.wait()
     

@@ -4,7 +4,7 @@ import numpy as np
 from utils import *
 bSize = 9
 
-resign_threshold = -0.9
+resign_threshold = -0.85
 
 class MCTSPlayer(object):
     
@@ -18,6 +18,9 @@ class MCTSPlayer(object):
         self.player_mode = player_mode
         self.initialize_game(status)
 
+    def reset(self):
+        self.initialize_game()
+    
     def initialize_game(self, status=None):
         if status==None:
             status = go.GoStatus()
@@ -54,6 +57,8 @@ class MCTSPlayer(object):
         self.root = self.root.add_child(coord_tuple2flat(coord))
         self.status = self.root.status
         del self.root.parent.children
+        #self.root.child_N = np.zeros([bSize*bSize+1], dtype=np.float32)
+        
 
     def pick_move(self):
         pick = np.argmax(self.root.child_N)
@@ -61,13 +66,16 @@ class MCTSPlayer(object):
 
     def tree_search(self):
         leaf = self.root.select_child() # selection
+        
         if leaf.is_done():
-            value = 1 if leaf.status.get_score()>0 else -1
+            value = 1 if leaf.status.get_score() >0 else -1
             leaf.backup(value, self.root)     
         else:
-            net_input = leaf.status.board.reshape(-1,bSize,bSize,1) * (self.player_mode if self.player_mode!=0 else leaf.status.to_play)
+            net_input = leaf.status.board.reshape(-1,bSize,bSize,1)  #* (self.player_mode if self.player_mode!=0 else leaf.status.to_play)
             move_probs, value = self.network.run(net_input)
+            #move_probs, _ = self.network.run(net_input * leaf.status.to_play)
             leaf.backup_unfinished(move_probs,value,self.root)
+        #print(self.root.Q,self.root.N, value)
         return leaf
 
     def generate_data(self):

@@ -13,7 +13,7 @@ class DummyNode(object):
 
 max_depth = bSize**2*1.4
 Cpuct = 1.34
-
+dirichlet_noise = 0.03 * 361 / (9 ** 2)
 class MCTSNode(object):
     def __init__(self, status, move=None, parent=None):
         if parent==None:
@@ -34,11 +34,22 @@ class MCTSNode(object):
         while True:
             #self.N+=1
             if cur.is_expanded==False: break  # reach a leaf, then selection finishes
+            
+            if ( len(cur.status.recent)>1
+                and cur.status.recent[-1] is None
+                    and cur.child_N[-1] == 0):
+                cur = cur.add_child(81)
+                continue
             best_move = np.argmax(cur.child_action_score) # select the best action
             #print(self.N, " select child: ", best_move)
             cur = cur.add_child(best_move) # expand
         return cur
-    
+
+    def add_noise(self,beta=0.25):
+        dirch = np.random.dirichlet(
+            [dirichlet_noise] * (82))
+        self.child_prior = (self.child_prior * (1-beta) + dirch * beta)
+
     def add_child(self, coord):
         if coord not in self.children:
             new_status = self.status.copy()
@@ -84,6 +95,7 @@ class MCTSNode(object):
     def backup_unfinished(self, move_probs, value, up_to):  # probs和value通过神经网络进行估计
         self.is_expanded = True                             # 标记展开
         self.P = self.child_prior = move_probs              # 子节点先验概率
+        self.add_noise(0.3)
         self.N+=1                                           # 路径访问次数加 1
         self.child_W = np.ones([bSize*bSize+1],dtype=np.float32) * value    # 设置当前状态下的价值
         if self.parent is None or self is up_to:

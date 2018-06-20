@@ -11,6 +11,10 @@ seconds_per_move=5
 timed_match=False
 search_n=800
 ckpt = 'checkpoints/model'
+learning_rate = 0.0001
+self_play_round = 100
+batch_size = 10
+from utils import to_one_hot
 
 def play(network):
     search_n = 100
@@ -32,14 +36,13 @@ def play(network):
 
 
 if __name__=='__main__':
-    self_play_round = 1000
     X = []
     p = []
     v = []
     try: os.mkdir('selfplay')
     except: pass
     rl_ckpt = 'selfplay/checkpoints/model'
-    learning_rate = 0.0001
+    
 
     g_train = tf.Graph()
     with g_train.as_default():
@@ -85,28 +88,53 @@ if __name__=='__main__':
             print("[!] self-play round %d"%r)
             player = play(PVNet(rl_ckpt))
             Xi, pi, vi = player.generate_data()
-            #X.extend(Xi)
-            #p.extend(pi)
-            #v.extend(vi)
+            X.extend(Xi)
+            p.extend(pi)
+            v.extend(vi)
+    X = np.array(X)
+    p = np.array(p)
+    v = np.array(v)
 
-        
-        with g_train.as_default():
-            batch_X = np.array(Xi).reshape(-1,9,9,1)
-            batch_p = to_one_hot(np.array(pi))
-            batch_v = np.array(vi).reshape(-1,1)
+    #savemat('selfplay/'+file_name, {'X': X, 'p':p, 'v':v}, appendmat=False)
+    shuffle_idx = list(range(len(X)))
+    random.shuffle(shuffle_idx)
+    X = X[shuffle_idx].reshape(-1,9,9,1)
+    p = p[shuffle_idx]
+    v = v[shuffle_idx].reshape(-1,1)
+    p_onehot = to_one_hot(p)
+    c = 0
+    with g_train.as_default():
+        print('----- training -----')
+        mean_loss = []
+        mean_p = []
+        mean_v = []
+        for itr in range(0,len(X),batch_size):
+            # prepare data bactch
+            if itr+batch_size>=len(X):
+                cat_n = itr+batch_size-len(X)
+                cat_idx = random.sample(range(len(X)),cat_n)
+
+                batch_X = np.concatenate((X[itr:],X[cat_idx]),axis=0)
+                batch_p = np.concatenate((p_onehot[itr:],p_onehot[cat_idx]),axis=0)
+                batch_v = np.concatenate((v[itr:],v[cat_idx]),axis=0)
+            else:
+                batch_X = X[itr:itr+batch_size]        
+                batch_p = p_onehot[itr:itr+batch_size]
+                batch_v = v[itr:itr+batch_size]
 
             _, cur_loss, p_loss, v_loss = sess.run([opt, loss, policy_loss, value_loss], {data_input: batch_X, p_input: batch_p, v_input: batch_v})
-
+            
             mean_loss.append(cur_loss)
             mean_p.append(p_loss)
             mean_v.append(v_loss)
 
-            if r%10==0:
-                print('[*] round %d, loss=%f (p_loss:%f, v_loss:%f\n)'%(r, np.mean(mean_loss),np.mean(mean_p),np.mean(mean_v)))
+            if c%100==0:
+                print('iter %d, loss=%f (p_loss:%f, v_loss:%f)'%(itr, np.mean(mean_loss),np.mean(mean_p),np.mean(mean_v)))
                 mean_loss = []
                 mean_p = []
                 mean_v = []
-            saver.save(sess, rl_ckpt)
-
-
-    #savemat('selfplay/'+file_name, {'X': X, 'p':p, 'v':v}, appendmat=False)
+                c = 0
+                saver.save(sess, rl_ckpt)
+                    
+        saver.save(sess, rl_ckpt)
+    #
