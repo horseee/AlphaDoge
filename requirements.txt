@@ -1,4 +1,6 @@
 numpy
+tensorflow
+scipy
 PyQt5
 sgf
 

@@ -5,3 +5,6 @@ do
     echo $file
     tar xvjf $file  -C ./train
 done
+
+echo "Merging dataset..."
+python3 merge_dataset.py
